@@ -154,11 +154,11 @@ Give one `.dta` per roster level in `roster(name "file.dta" ...)`. Each file has
 | Roster triggered by | `<roster>__id` values |
 |---|---|
 | Numeric question | 0, 1, ..., n−1 |
-| Text list | 1, 2, ...: the position of the item in the list |
+| Text list | 1, 2, ...: the position of the item in the list; with an export, the item codes in its `var__0c`, `var__1c`, ... columns |
 | Multi-select / yes-no | The selected (yes) codes |
 | Fixed items | The item codes set in Designer |
 
-If a list's items are not preloaded in the parent data, a text column named like the list question in the roster file gives them. The API numbers list items itself. So when ids from an old export have gaps (1, 2, 4), they are renumbered in order (1, 2, 3) with a warning. Rosters that share a trigger form one level: give one file, named after any of them. For example, roster `plot` with nested fixed roster `season` is two files: `plot.dta` (`plot__id`) and `season.dta` (`plot__id season__id`).
+If a list's items are not preloaded in the parent data, a text column named like the list question in the roster file gives them, ordered by id. With an export, keep its `var__0c`, `var__1c`, ... columns. Roster ids are then matched to those codes, so gaps left by deleted members are fine. HQ numbers preloaded list items itself (from 0), and susoassign maps the ids for you. Rosters that share a trigger form one level: give one file, named after any of them. For example, roster `plot` with nested fixed roster `season` is two files: `plot.dta` (`plot__id`) and `season.dta` (`plot__id season__id`).
 
 ---
 
@@ -255,10 +255,11 @@ GitHub Actions compiles and tests the Java core on Windows, macOS and Linux with
 ## Limitations
 
 - Only GPS latitude and longitude can be preloaded through the API. Altitude, accuracy and timestamp are dropped with a warning.
-- Text-list item codes are set by HQ (1, 2, ...). Preserving gaps from an old export is not possible through the API.
+- Through the API, HQ numbers text-list items itself (0, 1, ...), so an old export's item codes are not kept. They are kept when a zip from `create` is uploaded by hand in HQ.
 - Reusable categories are checked by HQ, not locally.
 - `create` does not check that responsible logins exist. HQ rejects unknown users per assignment, and the reason is in the log.
 - The Stata layer was tested on Windows (Stata 17). The Java core, which does all the I/O and HTTP, is tested on macOS and Linux in CI. Reports from Mac users are welcome.
+- Live checks on a demo HQ covered connecting, the questionnaire download and HQ's validation of every encoding (see [NEWS.md](NEWS.md)). A full creation cycle needs an interviewer account; run the live part of `susoassign_cert.do` once on your server.
 
 ---
 

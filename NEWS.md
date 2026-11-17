@@ -18,4 +18,15 @@ The request format comes from the Survey Solutions source code: `AssignmentsCont
 - Multi-select, yes/no and text-list answers are JSON arrays inside that string.
 - GPS is `lat$lon`.
 - Roster answers use `<questionGUID>_<rosterVector>`.
-- Text-list items sent as an array are numbered from 1.
+- HQ numbers the items of a text list sent as an array from 0 (Survey Solutions test `AssignmentsImportServiceTests.Simple`). List-roster ids in the data, either positions or export item codes, are mapped to those numbers.
+
+## Live checks (demo server, 2026-11-17)
+
+These were checked against a Survey Solutions demo server, with the Weather Stations Census questionnaire (124 questions, a list roster and a nested multi-select roster):
+
+- Connecting and listing questionnaires work.
+- The questionnaire document downloads and parses.
+- Every request built by `create`/`upload` passed HQ's answer validation. That covers main-level, list-roster and nested-roster identities, multi-select and list JSON, GPS, ISO dates and `ProtectedVariables`.
+- HQ's error messages are reported per row: PL0014, PL0016, PL0018 and PL0026, and "Question(s) not found".
+
+The server had no interviewer accounts, so no assignment was actually created. A full create, read-back and archive cycle is part of `susoassign_cert.do` (live part).

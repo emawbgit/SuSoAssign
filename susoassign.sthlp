@@ -131,7 +131,7 @@ the roster's questions. Row ids follow Survey Solutions:
 
 {p2colset 9 30 32 2}{...}
 {p2col:numeric trigger}0, 1, ..., n-1{p_end}
-{p2col:list trigger}1, 2, ... = position of the item in the list{p_end}
+{p2col:list trigger}1, 2, ... = position of the item in the list, or the item codes in an export's {it:var}{cmd:__0c}, {it:var}{cmd:__1c}, ... columns{p_end}
 {p2col:multi-select trigger}the selected codes{p_end}
 {p2col:fixed roster}the item codes set in Designer{p_end}
 

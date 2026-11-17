@@ -49,7 +49,7 @@ public final class Bridge {
             Api c = Commands.current();
             UI.local("connected", c == null ? "0" : "1");
             UI.local("base", c == null ? "" : c.base);
-            UI.local("user", c == null ? "" : c.user);
+            UI.local("conn_user", c == null ? "" : c.user);
             return 0;
         });
     }

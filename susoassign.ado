@@ -30,7 +30,7 @@ program _sa_java
         exit 601
     }
     local outs base created rejected failed unknown skipped notsent archived n n_assignments ///
-        n_rosterrows n_errors n_warnings protected connected user
+        n_rosterrows n_errors n_warnings protected connected conn_user
     foreach o of local outs {
         local `o'
     }
@@ -50,7 +50,7 @@ program _sa_setup, rclass
     syntax [, SERVer(string) USER(string) WORKspace(string) PASSword(string) TIMEout(integer 120)]
     if `"`server'`user'"' == "" {
         _sa_java status
-        if "`connected'" == "1" di as txt "susoassign: connected to " as res "`base'" as txt " as " as res "`user'"
+        if "`connected'" == "1" di as txt "susoassign: connected to " as res "`base'" as txt " as " as res "`conn_user'"
         else di as txt "susoassign: not connected; run {bf:susoassign setup, server() workspace() user()}"
         return local connected "`connected'"
         exit
@@ -84,7 +84,7 @@ program _sa_questionnaires, rclass
     }
     quietly destring version, replace
     sort title version
-    list title variable qid version, noobs abbreviate(12) sepby(title)
+    list title variable qid version, noobs clean abbreviate(24)
     return scalar N = _N
     if "`clear'" == "" restore
 end

@@ -78,7 +78,7 @@ assert strpos(json[1], `"{"Variable":"visit_date","Answer":"2024-05-01"}"') > 0 
 assert strpos(json[1], `"{"Variable":"income","Answer":"0.5"}"') > 0
 assert strpos(json[1], `"{"Variable":"assets","Answer":"[\"1\",\"3\"]"}"') > 0
 assert strpos(json[1], `"{"Variable":"loc","Answer":"-1.2921$36.8219"}"') > 0
-assert strpos(json[1], `"{"Identity":"e0000000000000000000000000000001_2","Variable":"age","Answer":"39"}"') > 0
+assert strpos(json[1], `"{"Identity":"e0000000000000000000000000000001_1","Variable":"age","Answer":"39"}"') > 0
 assert strpos(json[1], `"{"Identity":"f0000000000000000000000000000001_1","Variable":"plot_area","Answer":"0.5"}"') > 0
 assert strpos(json[1], `""ProtectedVariables":["members","assets"]"') > 0
 assert strpos(json[2], `"[\"Zoë\"]"') > 0                                     // UTF-8 kept

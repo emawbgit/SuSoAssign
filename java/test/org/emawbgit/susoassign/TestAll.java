@@ -177,32 +177,43 @@ public final class TestAll {
                 tab("asset", "interview__id\tasset__id\tasset_n", "A1\t1\t2"));
         eq("", errors(p));
         String b = body(p, 0);
-        assert b.contains("{\"Identity\":\"e0000000000000000000000000000001_1\",\"Variable\":\"age\",\"Answer\":\"40\"}") : b;
-        assert b.contains("{\"Identity\":\"e0000000000000000000000000000005_1\",\"Variable\":\"phone\",\"Answer\":\"555\"}") : b;   // alias roster member2
-        assert b.contains("{\"Identity\":\"e0000000000000000000000000000003_1\",\"Variable\":\"jobs\",\"Answer\":\"[\\\"farmer\\\"]\"}") : b;
-        assert b.contains("{\"Identity\":\"e0000000000000000000000000000004_1-1\",\"Variable\":\"job_hours\",\"Answer\":\"30\"}") : b;
+        // list-roster ids are positions 1..n in the data; HQ numbers list items from 0
+        assert b.contains("{\"Identity\":\"e0000000000000000000000000000001_0\",\"Variable\":\"age\",\"Answer\":\"40\"}") : b;
+        assert b.contains("{\"Identity\":\"e0000000000000000000000000000001_1\",\"Variable\":\"age\",\"Answer\":\"12\"}") : b;
+        assert b.contains("{\"Identity\":\"e0000000000000000000000000000005_0\",\"Variable\":\"phone\",\"Answer\":\"555\"}") : b;   // alias roster member2
+        assert b.contains("{\"Identity\":\"e0000000000000000000000000000003_0\",\"Variable\":\"jobs\",\"Answer\":\"[\\\"farmer\\\"]\"}") : b;
+        assert b.contains("{\"Identity\":\"e0000000000000000000000000000004_0-0\",\"Variable\":\"job_hours\",\"Answer\":\"30\"}") : b;
         assert b.contains("{\"Identity\":\"f0000000000000000000000000000001_0\",\"Variable\":\"plot_area\",\"Answer\":\"1.5\"}") : b;
         assert b.contains("{\"Identity\":\"f0000000000000000000000000000002_1-2\",\"Variable\":\"irrigated\",\"Answer\":\"1\"}") : b;
         assert b.contains("{\"Identity\":\"f0000000000000000000000000000003_1\",\"Variable\":\"asset_n\",\"Answer\":\"2\"}") : b;
         eq(7, p.rosterRows);
 
-        // list built from the roster file's text column, ids 10/20 renumbered 1/2 (export-style codes)
+        // list built from the roster file's text column (HQ preload style, any codes): ordered by id
         Preload r = load(true, null,
                 tab("hh", "interview__id\t_responsible", "A1\tint1"),
                 tab("member", "interview__id\tmember__id\tmembers\tage", "A1\t20\tBob\t12", "A1\t10\tAnn\t40"));
-        eq(0, r.errorCount());
-        assert has(r, "warning", "renumbered") : errors(r);
+        eq("", errors(r));
         String rb = body(r, 0);
         assert rb.contains("{\"Variable\":\"members\",\"Answer\":\"[\\\"Ann\\\",\\\"Bob\\\"]\"}") : rb;
-        assert rb.contains("\"e0000000000000000000000000000001_1\",\"Variable\":\"age\",\"Answer\":\"40\"") : rb;
-        assert rb.contains("\"e0000000000000000000000000000001_2\",\"Variable\":\"age\",\"Answer\":\"12\"") : rb;
+        assert rb.contains("\"e0000000000000000000000000000001_0\",\"Variable\":\"age\",\"Answer\":\"40\"") : rb;
+        assert rb.contains("\"e0000000000000000000000000000001_1\",\"Variable\":\"age\",\"Answer\":\"12\"") : rb;
 
-        // partial rows of a longer list keep their codes
+        // partial rows of a longer list: position 3 is the third item
         Preload part = load(true, null,
                 tab("hh", "interview__id\t_responsible\tmembers__0\tmembers__1\tmembers__2", "A1\tint1\ta\tb\tc"),
                 tab("member", "interview__id\tmember__id\tage", "A1\t3\t9"));
         eq("", errors(part));
-        assert body(part, 0).contains("\"e0000000000000000000000000000001_3\"") : body(part, 0);
+        assert body(part, 0).contains("\"e0000000000000000000000000000001_2\"") : body(part, 0);
+
+        // a Survey Solutions export: item codes in members__kc (1, 4 after a deletion) place the rows
+        Preload exp = load(true, null,
+                tab("hh", "interview__id\t_responsible\tmembers__0\tmembers__0c\tmembers__1\tmembers__1c", "A1\tint1\tAnn\t1\tCy\t4"),
+                tab("member", "interview__id\tmember__id\tage", "A1\t4\t30", "A1\t1\t50"));
+        eq("", errors(exp));
+        String eb = body(exp, 0);
+        assert eb.contains("\"e0000000000000000000000000000001_1\",\"Variable\":\"age\",\"Answer\":\"30\"") : eb;
+        assert eb.contains("\"e0000000000000000000000000000001_0\",\"Variable\":\"age\",\"Answer\":\"50\"") : eb;
+        assert !eb.contains("members__") && !eb.contains("\"4\"") : eb;
     }
 
     private static void validation() throws IOException {
@@ -248,7 +259,7 @@ public final class TestAll {
         eq(0, ex.errorCount());
         eq(1, ex.issues.size());
         assert body(ex, 0).contains("{\"Variable\":\"members\",\"Answer\":\"[\\\"Ann\\\"]\"},{\"Variable\":\"loc\",\"Answer\":\"1$2\"}") : body(ex, 0);
-        for (String frag : new String[]{"outside 0..1", "not an item of fixed roster", "not selected in 'assets'", "Code 4 is not a category of 'ranking'", "has 1 items but roster"})
+        for (String frag : new String[]{"outside 0..1", "not an item of fixed roster", "not selected in 'assets'", "Code 4 is not a category of 'ranking'", "List-roster id 2 does not match an item of 'members'"})
             assert e3.contains(frag) : "missing '" + frag + "' in\n" + e3;
     }
 
@@ -269,6 +280,8 @@ public final class TestAll {
         eq("", back.get(0).rows.get(0)[2]);              // .a -> empty
         eq("-0.5", back.get(0).rows.get(0)[3]);
         eq("Ann \"A\"", back.get(0).rows.get(0)[4]);      // literal quotes, as HQ reads them
+        eq(Arrays.asList("interview__id", "member__id", "age", "members"), back.get(1).header);   // item text added (PL0052)
+        eq("Ann \"A\"", back.get(1).rows.get(0)[3]);
         // the zip is read back (as upload does) into exactly the same requests
         Preload again = new Preload(testQx(), true);
         again.load(back, null);

@@ -26,8 +26,12 @@ import java.util.zip.ZipOutputStream;
  */
 final class Preload {
 
-    /** First code of a text-list item when the list is sent through the API as an array. Verified live (see NEWS.md). */
-    static final long LIST_CODE_BASE = 1;
+    /**
+     * Code HQ gives the first item of a text list sent as an array: the API's list answer is
+     * numbered by position from 0 (PreloadingValue "0", "1", ...; see AssignmentsImportServiceTests.Simple
+     * in the Survey Solutions source), whatever codes the items had in an export.
+     */
+    static final long LIST_CODE_BASE = 0;
 
     static final String[] SERVICE = {"_responsible", "_quantity", "_webmode", "_email", "_password",
             "_record_audio", "_comment", "_target_area", "_aascope"};
@@ -255,7 +259,11 @@ final class Preload {
                     c.part = suffix.startsWith("n") ? "-" + suffix.substring(1) : suffix;
                     break;
                 case "list":
-                    if (suffix != null && suffix.matches("\\d+c")) { c.role = "drop"; continue; }   // export item codes: the API numbers items itself
+                    if (suffix != null && suffix.matches("\\d+c")) {   // export item codes: place list-roster rows, not sent
+                        c.role = "listcode";
+                        c.part = suffix.substring(0, suffix.length() - 1);
+                        continue;
+                    }
                     if (suffix == null || !suffix.matches("\\d+")) { shape(b, c, q, q.var + "__0, " + q.var + "__1, ..."); continue; }
                     c.role = "list";
                     c.part = suffix;
@@ -409,6 +417,7 @@ final class Preload {
     private void readValues(Bound b, String[] r, String key, List<Long> vec) {
         String file = b.tab.name;
         Map<Qx.Question, TreeMap<Integer, String>> lists = new LinkedHashMap<>();
+        Map<Qx.Question, Map<Integer, Long>> listCodes = new HashMap<>();
         Map<Qx.Question, Map<Long, Double>> multis = new LinkedHashMap<>();
         Map<Qx.Question, Map<String, String>> gps = new LinkedHashMap<>();
         for (Col c : b.cols) {
@@ -440,6 +449,11 @@ final class Preload {
                     if (!v.isEmpty()) lists.computeIfAbsent(c.q, k -> new TreeMap<>()).put(Integer.parseInt(c.part), v);
                     break;
                 }
+                case "listcode": {
+                    Long code = Qx.toLong(norm(raw));
+                    if (code != null) listCodes.computeIfAbsent(c.q, k -> new HashMap<>()).put(Integer.parseInt(c.part), code);
+                    break;
+                }
                 case "gps": {
                     String v = norm(raw);
                     if (!v.isEmpty()) gps.computeIfAbsent(c.q, k -> new HashMap<>()).put(c.part, v);
@@ -456,6 +470,12 @@ final class Preload {
                 error(key, file, q.var, "List '" + q.var + "' has " + its.size() + " items; the maximum is " + q.maxAnswers + ".");
             Ans a = new Ans();
             a.items = its;
+            // item codes of an export (var__0c, var__1c, ...), used to place list-roster rows
+            Map<Integer, Long> kc = listCodes.get(q);
+            if (kc != null && kc.keySet().containsAll(e.getValue().keySet())) {
+                a.codes = new ArrayList<>();
+                for (Integer idx : e.getValue().keySet()) a.codes.add(kc.get(idx));
+            }
             put(q, key, vec, a);
             add(key, q, vec, Json.write(its));
         }
@@ -607,13 +627,15 @@ final class Preload {
     }
 
     /**
-     * The API takes a text list as an array, so the server numbers its items LIST_CODE_BASE, +1, ...
-     * Roster rows of a list roster must therefore use those codes; other codes are remapped by order.
+     * The API takes a text list as an array and HQ numbers its items LIST_CODE_BASE, +1, ... by position.
+     * Roster ids in the data are read as item positions 1..n (the convention of interviews and exports),
+     * or as the export's item codes when var__0c, var__1c, ... are given, and mapped to those numbers.
      */
     private void checkListRoster(Qx.Level l, String key, List<Long> parent, List<Long> codes, Ans t) {
         String file = l.name();
         Qx.Question q = l.trigger;
         List<String> list = t == null ? null : t.items;
+        Map<Long, Long> remap = new HashMap<>();   // roster id -> API item code
         if (list == null) {
             // build the list from the roster file's text column
             Map<String, Ans> texts = answers.get("\u0000listtext:" + l.key);
@@ -633,26 +655,20 @@ final class Preload {
             a.items = built;
             put(q, key, parent, a);
             add(key, q, parent, Json.write(built));
-            list = built;
-        } else if (list.size() < codes.size()) {
-            error(key, file, q.var, "List '" + q.var + "' has " + list.size() + " items but roster '" + file + "' has " + codes.size() + " rows.");
-            return;
+            for (int i = 0; i < codes.size(); i++) remap.put(codes.get(i), LIST_CODE_BASE + i);   // ordered by id
+        } else if (t.codes != null) {
+            for (int i = 0; i < t.codes.size(); i++) remap.put(t.codes.get(i), LIST_CODE_BASE + i);
+        } else {
+            for (int i = 0; i < list.size(); i++) remap.put((long) i + 1, LIST_CODE_BASE + i);
         }
-        boolean inRange = true;
-        for (Long c : codes) inRange &= c >= LIST_CODE_BASE && c < LIST_CODE_BASE + list.size();
-        if (inRange) return;   // ids already are the codes the server will give the list items
-        if (codes.size() != list.size()) {
-            error(key, file, file + "__id", "List-roster ids " + codes + " must be " + LIST_CODE_BASE + ".." + (LIST_CODE_BASE + list.size() - 1)
-                    + " (the position of each item in '" + q.var + "'): the API numbers text-list items itself.");
-            return;
+        for (Long c : codes) {
+            if (!remap.containsKey(c)) {
+                error(key, file, file + "__id", "List-roster id " + c + " does not match an item of '" + q.var + "' ("
+                        + (t != null && t.codes != null ? "item codes " + t.codes : list.size() + " items: ids are positions 1.." + list.size()) + ").");
+                return;
+            }
         }
-        Map<Long, Long> remap = new HashMap<>();
-        for (int i = 0; i < codes.size(); i++) remap.put(codes.get(i), LIST_CODE_BASE + i);
-        {
-            warn(key, file, file + "__id", "List-roster ids " + codes + " renumbered " + LIST_CODE_BASE + ".." + (LIST_CODE_BASE + codes.size() - 1)
-                    + " in order: the API numbers text-list items itself.");
-            listRemap.put(l.key + "|" + key + "|" + parent, remap);
-        }
+        listRemap.put(l.key + "|" + key + "|" + parent, remap);
     }
 
     // ================================================================ outputs
@@ -720,10 +736,16 @@ final class Preload {
                     keep.add(c.index);
                     header.add(c.role.equals("key") ? "interview__id" : c.role.equals("service") ? c.part : c.name);
                 }
+                // HQ needs the item text of a list roster in a column named like the list question (PL0052)
+                boolean addText = b.level.source.equals("list") && b.level.trigger != null;
+                for (Col c : b.cols) addText &= !"listtext".equals(c.role);
+                if (addText) header.add(b.level.trigger.var);
+                List<Qx.Level> chain = b.level.chain();
                 List<String[]> rows = new ArrayList<>();
                 for (String[] r : b.tab.rows) {
-                    String[] o = new String[keep.size()];
-                    for (int k = 0; k < o.length; k++) o[k] = cleanCell(r[keep.get(k)]);
+                    String[] o = new String[keep.size() + (addText ? 1 : 0)];
+                    for (int k = 0; k < keep.size(); k++) o[k] = cleanCell(r[keep.get(k)]);
+                    if (addText) o[o.length - 1] = listItemText(b, chain, r);
                     rows.add(o);
                 }
                 if (b == main && b.keyCol < 0) {
@@ -750,6 +772,23 @@ final class Preload {
                 z.closeEntry();
             }
         }
+    }
+
+    /** Text of the list item a list-roster row belongs to ("" when unknown). */
+    private String listItemText(Bound b, List<Qx.Level> chain, String[] r) {
+        String key = r[b.keyCol].trim();
+        List<Long> vec = new ArrayList<>();
+        for (Qx.Level l : chain)
+            for (Col c : b.cols)
+                if ("rid".equals(c.role) && c.ridLevel == l) { vec.add(Qx.toLong(norm(r[c.index]))); break; }
+        if (vec.size() != chain.size() || vec.contains(null)) return "";
+        List<Long> parent = new ArrayList<>(vec.subList(0, vec.size() - 1));
+        Map<Long, Long> m = listRemap.get(b.level.key + "|" + key + "|" + parent);
+        Ans a = get(b.level.trigger, key, parent);
+        Long code = m == null ? null : m.get(vec.get(vec.size() - 1));
+        if (code == null || a == null || a.items == null) return "";
+        int idx = (int) (code - LIST_CODE_BASE);
+        return idx >= 0 && idx < a.items.size() ? a.items.get(idx) : "";
     }
 
     // ================================================================ helpers
