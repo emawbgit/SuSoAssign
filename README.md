@@ -332,4 +332,4 @@ Emanuele Clemente, [github.com/emawbgit](https://github.com/emawbgit)
 
 ## License
 
-MIT (see [LICENSE](LICENSE)) © 2026 Emanuele Clemente. Survey Solutions is developed by the World Bank. This package is an independent tool and is not affiliated with or endorsed by the World Bank.
+MIT (see [LICENSE](LICENSE); third-party notice in [NOTICE](NOTICE)) © 2026 Emanuele Clemente. Survey Solutions is developed by the World Bank. This package is an independent tool and is not affiliated with or endorsed by the World Bank.
