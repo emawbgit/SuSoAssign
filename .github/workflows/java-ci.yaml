@@ -29,5 +29,5 @@ jobs:
       - name: The shipped jar is Java 11 bytecode and contains the bridge
         shell: bash
         run: |
-          unzip -l susoassign.jar | grep -q org/emawbgit/susoassign/Bridge.class
-          unzip -p susoassign.jar org/emawbgit/susoassign/Bridge.class | head -c 8 | od -An -tu1 | awk '{ if ($8 != 55) { print "class major version " $8 ", want 55 (Java 11)"; exit 1 } }'
+          unzip -o -q susoassign.jar org/emawbgit/susoassign/Bridge.class -d jarcheck
+          javap -v jarcheck/org/emawbgit/susoassign/Bridge.class | grep -q "major version: 55"
