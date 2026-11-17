@@ -1,0 +1,5 @@
+java/build/
+*.log
+.susoassign_test.env
+.Rhistory
+.DS_Store

@@ -1,0 +1,33 @@
+name: java-ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: ${{ matrix.os }} / Java ${{ matrix.java }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        java: ['11', '17', '21']   # Stata 16/17 bundle Java 11, Stata 18 Java 17, Stata 19 Java 21
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ matrix.java }}
+      - name: Compile and test (core; the Stata bridge needs Stata's sfi-api.jar)
+        shell: bash
+        run: sh java/build.sh
+      - name: The shipped jar is Java 11 bytecode and contains the bridge
+        shell: bash
+        run: |
+          unzip -l susoassign.jar | grep -q org/emawbgit/susoassign/Bridge.class
+          unzip -p susoassign.jar org/emawbgit/susoassign/Bridge.class | head -c 8 | od -An -tu1 | awk '{ if ($8 != 55) { print "class major version " $8 ", want 55 (Java 11)"; exit 1 } }'

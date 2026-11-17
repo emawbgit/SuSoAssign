@@ -1,0 +1,17 @@
+cff-version: 1.2.0
+message: "If you use SuSoAssign, please cite it as below."
+title: "SuSoAssign: create and upload Survey Solutions assignments from Stata"
+type: software
+authors:
+  - family-names: Clemente
+    given-names: Emanuele
+version: 0.1.0
+date-released: 2026-11-17
+license: MIT
+repository-code: "https://github.com/emawbgit/SuSoAssign"
+keywords:
+  - Survey Solutions
+  - Stata
+  - CAPI
+  - assignments
+  - preloading

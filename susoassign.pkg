@@ -1,0 +1,15 @@
+v 3
+d susoassign: create and upload Survey Solutions assignments, with prefilled and protected answers
+d
+d Builds assignments from Stata data (main level, rosters, web mode, protected answers),
+d validates them against the questionnaire and creates them on Survey Solutions Headquarters
+d through its API. Runs in Stata's bundled Java: no R or Python needed.
+d
+d Author: Emanuele Clemente
+d Support: https://github.com/emawbgit/SuSoAssign/issues
+d
+d Distribution-Date: 20261117
+d Requires: Stata version 16
+f susoassign.ado
+f susoassign.sthlp
+f susoassign.jar

@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="518" height="600" viewBox="0 0 518 600">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#16324F"/>
+      <stop offset="1" stop-color="#0E7C86"/>
+    </linearGradient>
+    <clipPath id="hexclip"><polygon points="259,14 500,153 500,447 259,586 18,447 18,153"/></clipPath>
+  </defs>
+  <polygon points="259,14 500,153 500,447 259,586 18,447 18,153" fill="url(#bg)"/>
+  <g clip-path="url(#hexclip)">
+    <circle cx="420" cy="120" r="140" fill="#FFFFFF" opacity="0.05"/>
+    <circle cx="90" cy="470" r="120" fill="#FFFFFF" opacity="0.04"/>
+  </g>
+  <g transform="translate(0,-18)">
+  <!-- assignment card (clipboard) -->
+  <g transform="translate(150,112)">
+    <rect x="0" y="0" width="190" height="236" rx="16" fill="#0B2239" opacity="0.55"/>
+    <rect x="0" y="0" width="190" height="236" rx="16" fill="none" stroke="#E8F1F2" stroke-width="7"/>
+    <!-- clip -->
+    <rect x="58" y="-16" width="74" height="30" rx="9" fill="#F4A259"/>
+    <!-- prefilled rows: label + answer -->
+    <g fill="#E8F1F2">
+      <rect x="22" y="42" width="44" height="13" rx="4"/><rect x="76" y="42" width="92" height="13" rx="4" fill="#F4A259"/>
+      <rect x="22" y="72" width="44" height="13" rx="4"/><rect x="76" y="72" width="70" height="13" rx="4" fill="#F4A259"/>
+      <rect x="22" y="102" width="44" height="13" rx="4"/><rect x="76" y="102" width="84" height="13" rx="4" fill="#F4A259"/>
+      <rect x="22" y="132" width="44" height="13" rx="4"/><rect x="76" y="132" width="60" height="13" rx="4" opacity="0.45"/>
+      <rect x="22" y="162" width="44" height="13" rx="4"/><rect x="76" y="162" width="76" height="13" rx="4" opacity="0.45"/>
+      <!-- roster rows -->
+      <rect x="22" y="196" width="146" height="9" rx="3" opacity="0.35"/>
+      <rect x="22" y="212" width="146" height="9" rx="3" opacity="0.35"/>
+    </g>
+  </g>
+  <!-- padlock: protected answers -->
+  <g transform="translate(318,250)">
+    <path d="M14 34 L14 22 C14 6, 48 6, 48 22 L48 34" fill="none" stroke="#F4A259" stroke-width="9" stroke-linecap="round"/>
+    <rect x="0" y="32" width="62" height="50" rx="10" fill="#F4A259"/>
+    <circle cx="31" cy="53" r="7" fill="#16324F"/>
+    <rect x="28" y="56" width="6" height="14" rx="3" fill="#16324F"/>
+  </g>
+  <!-- upload arrow -->
+  <g transform="translate(104,236)" stroke="#E8F1F2" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <path d="M10 112 L10 40"/>
+    <path d="M-12 62 L10 40 L32 62"/>
+  </g>
+  <g transform="translate(104,236)">
+    <circle cx="10" cy="128" r="16" fill="#F4A259"/>
+  </g>
+  </g>
+  <text x="259" y="478" text-anchor="middle" font-family="DejaVu Sans, Helvetica, Arial, sans-serif" font-weight="bold" font-size="49" fill="#FFFFFF" letter-spacing="0.5">SuSo<tspan fill="#F4A259">Assign</tspan></text>
+  <polygon points="259,14 500,153 500,447 259,586 18,447 18,153" fill="none" stroke="#F4A259" stroke-width="22" stroke-linejoin="round"/>
+</svg>

@@ -1,0 +1,66 @@
+{
+  "$type": "QuestionnaireDocument",
+  "PublicKey": "11111111-2222-3333-4444-555555555555",
+  "Title": "SuSoAssign test household",
+  "VariableName": "hh",
+  "Children": [
+    { "$type": "Group", "PublicKey": "a0000000000000000000000000000001", "Title": "Cover", "IsRoster": false,
+      "Children": [
+        { "$type": "TextQuestion", "PublicKey": "b0000000000000000000000000000001", "VariableName": "hhid", "Featured": true, "QuestionScope": 0 },
+        { "$type": "SingleQuestion", "PublicKey": "b0000000000000000000000000000002", "VariableName": "region", "Featured": true,
+          "Answers": [ {"AnswerText": "North", "AnswerValue": "1"}, {"AnswerText": "South", "AnswerValue": "2"} ] },
+        { "$type": "NumericQuestion", "PublicKey": "b0000000000000000000000000000003", "VariableName": "hhsize", "IsInteger": true, "Featured": true },
+        { "$type": "NumericQuestion", "PublicKey": "b0000000000000000000000000000004", "VariableName": "income", "IsInteger": false, "QuestionScope": 2 },
+        { "$type": "DateTimeQuestion", "PublicKey": "b0000000000000000000000000000005", "VariableName": "visit_date", "Featured": true },
+        { "$type": "GpsCoordinateQuestion", "PublicKey": "b0000000000000000000000000000006", "VariableName": "loc", "Featured": true },
+        { "$type": "MultyOptionsQuestion", "PublicKey": "b0000000000000000000000000000007", "VariableName": "assets", "MaxAllowedAnswers": 3,
+          "Answers": [ {"AnswerText": "TV", "AnswerValue": "1"}, {"AnswerText": "Radio", "AnswerValue": "2"}, {"AnswerText": "Car", "AnswerValue": "3"},
+                       {"AnswerText": "None", "AnswerValue": "-1"} ] },
+        { "$type": "MultyOptionsQuestion", "PublicKey": "b0000000000000000000000000000008", "VariableName": "ranking", "AreAnswersOrdered": true,
+          "Answers": [ {"AnswerText": "A", "AnswerValue": "1"}, {"AnswerText": "B", "AnswerValue": "2"}, {"AnswerText": "C", "AnswerValue": "3"} ] },
+        { "$type": "MultyOptionsQuestion", "PublicKey": "b0000000000000000000000000000009", "VariableName": "services", "YesNoView": true,
+          "Answers": [ {"AnswerText": "Water", "AnswerValue": "1"}, {"AnswerText": "Power", "AnswerValue": "2"}, {"AnswerText": "Phone", "AnswerValue": "3"} ] },
+        { "$type": "TextListQuestion", "PublicKey": "b0000000000000000000000000000010", "VariableName": "members", "MaxAnswerCount": 10 },
+        { "$type": "NumericQuestion", "PublicKey": "b0000000000000000000000000000011", "VariableName": "n_plots", "IsInteger": true },
+        { "$type": "MultyOptionsQuestion", "PublicKey": "b0000000000000000000000000000012", "VariableName": "crops", "CategoriesId": "c0000000000000000000000000000001" },
+        { "$type": "MultimediaQuestion", "PublicKey": "b0000000000000000000000000000013", "VariableName": "photo" },
+        { "$type": "SingleQuestion", "PublicKey": "b0000000000000000000000000000014", "VariableName": "head", "LinkedToRosterId": "d0000000000000000000000000000001" },
+        { "$type": "Variable", "PublicKey": "b0000000000000000000000000000015", "Name": "calc_total", "Expression": "1" },
+        { "$type": "StaticText", "PublicKey": "b0000000000000000000000000000016", "Text": "Hello" }
+      ] },
+    { "$type": "Group", "PublicKey": "d0000000000000000000000000000001", "Title": "Members", "VariableName": "member", "IsRoster": true,
+      "RosterSizeSource": 0, "RosterSizeQuestionId": "b0000000-0000-0000-0000-000000000010",
+      "Children": [
+        { "$type": "NumericQuestion", "PublicKey": "e0000000000000000000000000000001", "VariableName": "age", "IsInteger": true },
+        { "$type": "SingleQuestion", "PublicKey": "e0000000000000000000000000000002", "VariableName": "sex",
+          "Answers": [ {"AnswerText": "M", "AnswerValue": "1"}, {"AnswerText": "F", "AnswerValue": "2"} ] },
+        { "$type": "TextListQuestion", "PublicKey": "e0000000000000000000000000000003", "VariableName": "jobs" },
+        { "$type": "Group", "PublicKey": "d0000000000000000000000000000004", "Title": "Jobs", "VariableName": "job", "IsRoster": true,
+          "RosterSizeSource": 0, "RosterSizeQuestionId": "e0000000000000000000000000000003",
+          "Children": [
+            { "$type": "NumericQuestion", "PublicKey": "e0000000000000000000000000000004", "VariableName": "job_hours", "IsInteger": true }
+          ] }
+      ] },
+    { "$type": "Group", "PublicKey": "d0000000000000000000000000000005", "Title": "Members (2)", "VariableName": "member2", "IsRoster": true,
+      "RosterSizeSource": 0, "RosterSizeQuestionId": "b0000000000000000000000000000010",
+      "Children": [
+        { "$type": "TextQuestion", "PublicKey": "e0000000000000000000000000000005", "VariableName": "phone" }
+      ] },
+    { "$type": "Group", "PublicKey": "d0000000000000000000000000000002", "Title": "Plots", "VariableName": "plot", "IsRoster": true,
+      "RosterSizeSource": 0, "RosterSizeQuestionId": "b0000000000000000000000000000011",
+      "Children": [
+        { "$type": "NumericQuestion", "PublicKey": "f0000000000000000000000000000001", "VariableName": "plot_area" },
+        { "$type": "Group", "PublicKey": "d0000000000000000000000000000003", "Title": "Seasons", "VariableName": "season", "IsRoster": true,
+          "RosterSizeSource": 1, "FixedRosterTitles": [ {"Value": 1, "Title": "Rainy"}, {"Value": 2, "Title": "Dry"} ],
+          "Children": [
+            { "$type": "SingleQuestion", "PublicKey": "f0000000000000000000000000000002", "VariableName": "irrigated",
+              "Answers": [ {"AnswerText": "Yes", "AnswerValue": "1"}, {"AnswerText": "No", "AnswerValue": "2"} ] }
+          ] }
+      ] },
+    { "$type": "Group", "PublicKey": "d0000000000000000000000000000006", "Title": "Asset details", "VariableName": "asset", "IsRoster": true,
+      "RosterSizeSource": 0, "RosterSizeQuestionId": "b0000000000000000000000000000007",
+      "Children": [
+        { "$type": "NumericQuestion", "PublicKey": "f0000000000000000000000000000003", "VariableName": "asset_n", "IsInteger": true }
+      ] }
+  ]
+}

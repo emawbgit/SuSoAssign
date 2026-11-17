@@ -1,0 +1,4 @@
+v 3
+d SuSoAssign: Survey Solutions assignments from Stata
+d Emanuele Clemente, https://github.com/emawbgit/SuSoAssign
+p susoassign Create and upload Survey Solutions assignments with prefilled and protected answers
